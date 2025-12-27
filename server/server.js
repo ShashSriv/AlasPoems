@@ -43,11 +43,34 @@ const isAdmin = (req, res, next) => {
 
 // Routes
 
+// POST /api/login - Admin Login
+app.post('/api/login', (req, res) => {
+  const { password } = req.body;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (password === adminPassword) {
+    res.status(200).json({ success: true, message: 'Login successful' });
+  } else {
+    res.status(401).json({ success: false, message: 'Invalid password' });
+  }
+});
+
 // GET /api/poems - Read all
 app.get('/api/poems', async (req, res) => {
   try {
     const poems = await Poem.find().sort({ date: -1 });
     res.json(poems);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET /api/poems/:id - Read one
+app.get('/api/poems/:id', async (req, res) => {
+  try {
+    const poem = await Poem.findById(req.params.id);
+    if (!poem) return res.status(404).json({ message: 'Poem not found' });
+    res.json(poem);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -68,6 +91,31 @@ app.post('/api/poems', async (req, res) => {
     res.status(201).json(newPoem);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+// POST /api/poems/:id/like - Like/Unlike (Public)
+app.post('/api/poems/:id/like', async (req, res) => {
+  const { action } = req.body;
+  if (action !== 'inc' && action !== 'dec') {
+    return res.status(400).json({ message: "Invalid action. Use 'inc' or 'dec'." });
+  }
+
+  try {
+    const increment = action === 'inc' ? 1 : -1;
+    const updatedPoem = await Poem.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: increment } },
+      { new: true }
+    );
+    
+    if (!updatedPoem) {
+        return res.status(404).json({ message: 'Poem not found' });
+    }
+    
+    res.json(updatedPoem);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
