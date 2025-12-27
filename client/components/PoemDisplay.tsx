@@ -22,6 +22,8 @@ const PoemDisplay: React.FC<PoemProps> = ({ poem, isAdmin, onDeleteRequest, imag
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(poem.likes);
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
   useEffect(() => {
     // Check localStorage on mount
     const likedPoems = JSON.parse(localStorage.getItem('likedPoems') || '[]');
@@ -50,7 +52,7 @@ const PoemDisplay: React.FC<PoemProps> = ({ poem, isAdmin, onDeleteRequest, imag
 
     // API Call
     try {
-        await fetch(`http://localhost:5000/api/poems/${poem._id}/like`, {
+        await fetch(`${API_BASE}/poems/${poem._id}/like`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

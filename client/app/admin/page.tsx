@@ -16,9 +16,11 @@ export default function AdminPage() {
   const poemId = searchParams.get('id');
   const isEditing = !!poemId;
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
   useEffect(() => {
     if (isEditing) {
-      fetch(`http://localhost:5000/api/poems/${poemId}`)
+      fetch(`${API_BASE}/poems/${poemId}`)
         .then(res => {
             if (!res.ok) throw new Error('Failed to fetch poem');
             return res.json();
@@ -41,8 +43,8 @@ export default function AdminPage() {
     setStatus({ type: '', msg: '' });
 
     const url = isEditing 
-        ? `http://localhost:5000/api/poems/${poemId}`
-        : 'http://localhost:5000/api/poems';
+        ? `${API_BASE}/poems/${poemId}`
+        : `${API_BASE}/poems`;
     
     const method = isEditing ? 'PUT' : 'POST';
 

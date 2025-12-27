@@ -45,6 +45,8 @@ export default function Home() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPoemId, setSelectedPoemId] = useState<string | null>(null);
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
   useEffect(() => {
     // Check admin status
     const adminStatus = localStorage.getItem('isAdmin') === 'true';
@@ -53,7 +55,7 @@ export default function Home() {
     // Prepare shuffled images
     setShuffledImages(shuffleArray(CAT_IMAGES));
 
-    fetch('http://localhost:5000/api/poems')
+    fetch(`${API_BASE}/poems`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch');
         return res.json();
@@ -78,7 +80,7 @@ export default function Home() {
     if (!selectedPoemId) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/poems/${selectedPoemId}`, {
+      const res = await fetch(`${API_BASE}/poems/${selectedPoemId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
